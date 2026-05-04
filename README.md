@@ -1,73 +1,83 @@
-# React + TypeScript + Vite
+# 📸 Album Organizer — 智慧相簿整理
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> 截圖轉筆記、回憶標狀態、旅程自動歸檔
 
-Currently, two official plugins are available:
+<p align="center">
+  <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" />
+  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript" />
+  <img src="https://img.shields.io/badge/Vite-6.x-646CFF?logo=vite" />
+  <img src="https://img.shields.io/badge/Tailwind-4.x-06B6D4?logo=tailwindcss" />
+  <img src="https://img.shields.io/badge/License-MIT-green.svg" />
+</p>
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## ✨ 功能
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **🗂️ 智慧整理** — 自動分類照片（截圖、回憶、未知類型）
+- **📱 快速滑動** — Tinder 式滑動介面，快速標記照片狀態（已發/未發/珍藏）
+- **🗺️ 旅程歸檔** — 將照片按時間與地點自動歸類為旅程
+- **📝 截圖轉筆記** — OCR 提取截圖文字，自動轉為可搜尋筆記
+- **🖼️ 相簿瀏覽** — 網格/時間軸雙模式瀏覽
+- **🛠️ 工具箱** — 圖片壓縮、格式轉換等實用工具
+- **🌙 深色模式** — 護眼設計，日夜皆宜
 
-## Expanding the ESLint configuration
+---
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## 🛠️ 技術棧
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| 層 | 技術 |
+|----|------|
+| **框架** | React 19 + Vite |
+| **語言** | TypeScript |
+| **樣式** | Tailwind CSS v4 |
+| **動畫** | Framer Motion |
+| **圖示** | Lucide React |
+| **狀態管理** | React Context |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+---
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## 🚀 快速開始
+
+```bash
+cd album-organizer
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+開啟瀏覽器訪問 `http://localhost:5173`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### 建構
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
 ```
+
+輸出至 `dist/` 目錄。
+
+---
+
+## 📁 專案結構
+
+```
+album-organizer/
+├── src/
+│   ├── App.tsx              # 主應用 + 底部導航
+│   ├── context/             # React Context 狀態管理
+│   ├── features/            # 功能模組
+│   │   ├── OrganizeTab.tsx  # 智慧整理
+│   │   ├── SwipeTab.tsx     # 快速滑動標記
+│   │   ├── JourneysTab.tsx  # 旅程管理
+│   │   ├── NotesTab.tsx     # 截圖筆記
+│   │   ├── GalleryTab.tsx   # 相簿瀏覽
+│   │   └── ToolsTab.tsx     # 工具箱
+│   └── components/          # 共用元件
+├── index.html
+└── package.json
+```
+
+---
+
+## 📝 License
+
+MIT License © 2026
