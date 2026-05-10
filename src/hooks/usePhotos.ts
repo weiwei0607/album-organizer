@@ -3,7 +3,6 @@ import { db } from '../db';
 import type { PhotoItem } from '../db';
 import { useAppContext } from '../context/AppContext';
 import { analyzeScreenshot, generateIGCaption } from '../utils/ai';
-import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import type { CategoryKey } from '../constants';
 
@@ -146,6 +145,7 @@ export function usePhotos() {
   };
 
   const exportZip = useCallback(async (selectedPhotos: PhotoItem[]) => {
+    const { default: JSZip } = await import('jszip');
     const zip = new JSZip();
     const folder = zip.folder('相簿整理');
     const meta: any[] = [];

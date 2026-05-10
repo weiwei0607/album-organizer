@@ -3,7 +3,6 @@ import { db } from '../db';
 import type { Journey, PhotoItem } from '../db';
 import { useAppContext } from '../context/AppContext';
 import { saveAs } from 'file-saver';
-import JSZip from 'jszip';
 
 function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' });
@@ -250,6 +249,7 @@ export function useJourneys() {
 
   const exportJourneyData = useCallback(async (journey: Journey) => {
     const journeyPhotos = photos.filter(p => journey.photoIds.includes(p.id));
+    const { default: JSZip } = await import('jszip');
     const zip = new JSZip();
     const folder = zip.folder(journey.name.replace(/[^\w\s-]/g, ''));
 
