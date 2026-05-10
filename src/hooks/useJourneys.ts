@@ -2,7 +2,6 @@ import { useState, useCallback, useRef } from 'react';
 import { db } from '../db';
 import type { Journey, PhotoItem } from '../db';
 import { useAppContext } from '../context/AppContext';
-import html2canvas from 'html2canvas';
 import { saveAs } from 'file-saver';
 import JSZip from 'jszip';
 
@@ -102,32 +101,19 @@ export function useJourneys() {
       if (apiKey && clusterPhotos.length > 0) {
         try {
           const coverPhoto = clusterPhotos[0];
-          const systemPrompt = `你是一個旅遊達人，根據這組旅行照片，請幫這趟旅程取一個有詩意的標題，並推測地點，寫一段 50 字內的遊記開頭。請返回 JSON：{"name": "標題", "location": "地點", "description": "遊記開頭"}`;
-          const res = await fetch('https://api.openai.com/v1/chat/completions', {
+          const base64Data = coverPhoto.fullImage.split(',')[1] || coverPhoto.fullImage;
+          const prompt = `你是一個旅遊達人，根據這組旅行照片，請幫這趟旅程取一個有詩意的標題，並推測地點，寫一段 50 字內的遊記開頭。這組旅程有 ${clusterPhotos.length} 張照片，時間從 ${new Date(startDate).toLocaleDateString()} 到 ${new Date(endDate).toLocaleDateString()}。請返回 JSON：{"name": "標題", "location": "地點", "description": "遊記開頭"}`;
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${apiKey}`,
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              model: 'gpt-4o-mini',
-              messages: [
-                { role: 'system', content: systemPrompt },
-                {
-                  role: 'user',
-                  content: [
-                    { type: 'image_url', image_url: { url: coverPhoto.fullImage, detail: 'low' } },
-                    { type: 'text', text: `這組旅程有 ${clusterPhotos.length} 張照片，時間從 ${new Date(startDate).toLocaleDateString()} 到 ${new Date(endDate).toLocaleDateString()}。請為這趟旅程命名。` },
-                  ],
-                },
-              ],
-              max_tokens: 200,
-              temperature: 0.6,
+              contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: 'image/jpeg', data: base64Data } }] }],
+              generationConfig: { temperature: 0.6 },
             }),
           });
           if (res.ok) {
             const data = await res.json();
-            const raw = data.choices[0]?.message?.content || '{}';
+            const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
             const jsonMatch = raw.match(/\{[\s\S]*\}/);
             const parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
             name = parsed.name || name;
@@ -183,33 +169,24 @@ export function useJourneys() {
     setGeneratingJourneyStory(true);
     try {
       const journeyPhotos = photos.filter(p => journey.photoIds.includes(p.id)).slice(0, 5);
-      const content: any[] = [
-        { type: 'text', text: `這是一趟${journey.location || ''}的旅程，時間是 ${formatDateRange(journey.startDate, journey.endDate)}，共 ${journey.photoIds.length} 張照片。請根據這些照片寫一段 100 字以內的旅遊遊記，風格溫暖、有畫面感，像跟朋友分享旅行見聞。` },
-      ];
+      const textPrompt = `你是一個擅長寫旅遊遊記的作家，用繁體中文寫作，風格溫暖有畫面感。這是一趟${journey.location || ''}的旅程，時間是 ${formatDateRange(journey.startDate, journey.endDate)}，共 ${journey.photoIds.length} 張照片。請根據這些照片寫一段 100 字以內的旅遊遊記，風格溫暖、有畫面感，像跟朋友分享旅行見聞。`;
+      const parts: any[] = [{ text: textPrompt }];
       for (const p of journeyPhotos) {
-        content.push({ type: 'image_url', image_url: { url: p.fullImage, detail: 'low' } });
+        parts.push({ inline_data: { mime_type: 'image/jpeg', data: p.fullImage.split(',')[1] || p.fullImage } });
       }
 
-      const res = await fetch('https://api.openai.com/v1/chat/completions', {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'gpt-4o-mini',
-          messages: [
-            { role: 'system', content: '你是一個擅長寫旅遊遊記的作家，用繁體中文寫作，風格溫暖有畫面感。' },
-            { role: 'user', content: content },
-          ],
-          max_tokens: 400,
-          temperature: 0.7,
+          contents: [{ parts }],
+          generationConfig: { temperature: 0.7 },
         }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        const story = data.choices[0]?.message?.content?.trim() || '';
+        const story = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
         await db.journeys.update(journey.id, { description: story });
         await loadJourneys();
         setActiveJourney({ ...journey, description: story });
@@ -233,6 +210,7 @@ export function useJourneys() {
     if (!journeyRef.current) return;
     setExportingJourney(true);
     try {
+      const { default: html2canvas } = await import('html2canvas');
       const canvas = await html2canvas(journeyRef.current, {
         scale: 2,
         useCORS: true,

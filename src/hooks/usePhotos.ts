@@ -16,9 +16,13 @@ export function usePhotos() {
   const [igCaption, setIgCaption] = useState<string | null>(null);
 
   const processPhoto = useCallback(async (photo: PhotoItem) => {
-    if (!workerRef.current || processingIds.has(photo.id)) return;
+    if (processingIds.has(photo.id)) return;
     setProcessingIds(prev => new Set(prev).add(photo.id));
     try {
+      if (!workerRef.current) {
+        const { createWorker } = await import('tesseract.js');
+        workerRef.current = await createWorker('chi_tra+eng');
+      }
       const { data: { text } } = await workerRef.current.recognize(photo.fullImage);
       const trimmed = text.trim();
       const isScreenshot = trimmed.length > 15 && /[\d\$￥€£¥]|http|@|#|NT\$|RMB|元|折|優惠|地址|電話|時間|日期/.test(trimmed);

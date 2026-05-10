@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef, useCallback } from 'react';
 import { db, type PhotoItem, type Journey } from '../db';
-import { createWorker, type Worker } from 'tesseract.js';
+import type { Worker } from 'tesseract.js';
 import { useApiKey } from '../hooks/useApiKey';
 import { useDarkMode } from '../hooks/useDarkMode';
 
@@ -45,15 +45,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     loadJourneys();
   }, [loadPhotos, loadJourneys]);
 
-  // Init Tesseract
+  // Tesseract worker is lazy-initialized on first OCR use (see workerRef consumers)
   useEffect(() => {
-    let worker: Worker;
-    (async () => {
-      worker = await createWorker('chi_tra+eng');
-      workerRef.current = worker;
-    })();
     return () => {
-      worker?.terminate();
+      workerRef.current?.terminate();
     };
   }, []);
 
