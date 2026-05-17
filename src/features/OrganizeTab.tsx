@@ -191,7 +191,7 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 function createThumbnail(base64: string, maxSize = 400): Promise<string> {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const img = document.createElement('img');
     img.onload = () => {
       const canvas = document.createElement('canvas');
@@ -202,6 +202,7 @@ function createThumbnail(base64: string, maxSize = 400): Promise<string> {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       resolve(canvas.toDataURL('image/jpeg', 0.75));
     };
+    img.onerror = () => reject(new Error(`Failed to load image for thumbnail: ${base64.slice(0, 30)}...`));
     img.src = base64;
   });
 }

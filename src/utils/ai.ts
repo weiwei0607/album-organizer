@@ -1,7 +1,8 @@
 // Gemini API wrappers for screenshot AI classification and IG caption generation
 // API key is stored in localStorage by user
 
-const getApiUrl = (apiKey: string) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+const GEMINI_GENERATE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const GEMINI_MODEL_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash';
 
 export interface AIAnalysisResult {
   category: 'shopping' | 'location' | 'quote' | 'recipe' | 'work' | 'other';
@@ -12,6 +13,13 @@ export interface AIAnalysisResult {
 
 function parseGeminiResponse(data: any): string {
   return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+}
+
+function geminiHeaders(apiKey: string): Record<string, string> {
+  return {
+    'Content-Type': 'application/json',
+    'x-goog-api-key': apiKey,
+  };
 }
 
 /**
@@ -46,9 +54,9 @@ export async function analyzeScreenshot(
   // Extract base64 part (remove data:image/jpeg;base64,)
   const base64Data = base64Image.split(',')[1] || base64Image;
 
-  const res = await fetch(getApiUrl(apiKey), {
+  const res = await fetch(GEMINI_GENERATE_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: geminiHeaders(apiKey),
     body: JSON.stringify({
       contents: [{
         parts: [
@@ -108,9 +116,9 @@ export async function generateIGCaption(
   const prompt = systemPrompt + "\n\n這張照片的 OCR 文字（如果有）：\n" + (ocrText.slice(0, 300) || '（無文字）') + "\n\n請生成 Instagram 文案：";
   const base64Data = base64Image.split(',')[1] || base64Image;
 
-  const res = await fetch(getApiUrl(apiKey), {
+  const res = await fetch(GEMINI_GENERATE_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: geminiHeaders(apiKey),
     body: JSON.stringify({
       contents: [{
         parts: [
@@ -136,7 +144,9 @@ export async function generateIGCaption(
  */
 export async function testApiKey(apiKey: string): Promise<boolean> {
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key=${apiKey}`);
+    const res = await fetch(GEMINI_MODEL_URL, {
+      headers: { 'x-goog-api-key': apiKey }
+    });
     return res.ok;
   } catch {
     return false;
@@ -167,9 +177,9 @@ export async function generateCategorySummary(
   const userContent = texts.map((t, i) => `筆記 ${i + 1}：\n${t}`).join('\n\n---\n\n');
   const prompt = systemPrompt + "\n\n" + `請幫我整理以下 ${texts.length} 則筆記：\n\n${userContent}`;
 
-  const res = await fetch(getApiUrl(apiKey), {
+  const res = await fetch(GEMINI_GENERATE_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: geminiHeaders(apiKey),
     body: JSON.stringify({
       contents: [{
         parts: [{ text: prompt }]
