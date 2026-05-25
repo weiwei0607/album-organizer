@@ -24,7 +24,7 @@ export const OrganizeTab: React.FC<OrganizeTabProps> = ({ setShowSettings }) => 
       const base64 = await fileToBase64(file);
       const thumbnail = await createThumbnail(base64);
       const item: PhotoItem = {
-        id: Math.random().toString(36).slice(2) + Date.now().toString(36),
+        id: crypto.randomUUID(),
         fileName: file.name,
         thumbnail,
         fullImage: base64,
@@ -96,7 +96,7 @@ export const OrganizeTab: React.FC<OrganizeTabProps> = ({ setShowSettings }) => 
             <span className="text-sm font-bold text-violet-700 dark:text-violet-300">AI 分析已啟用</span>
           </div>
           <p className="text-xs text-violet-600/80 dark:text-violet-400/80">
-            已設定 OpenAI API Key，可使用 AI 進一步分析截圖內容
+            已設定 Gemini API Key，可使用 AI 進一步分析截圖內容
           </p>
         </div>
       )}
@@ -106,7 +106,7 @@ export const OrganizeTab: React.FC<OrganizeTabProps> = ({ setShowSettings }) => 
           className="w-full py-3.5 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 text-sm font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
         >
           <Sparkles className="w-4 h-4" />
-          設定 OpenAI API Key 啟用 AI 分析
+          設定 Gemini API Key 啟用 AI 分析
         </button>
       )}
 
@@ -191,10 +191,10 @@ function fileToBase64(file: File): Promise<string> {
 }
 
 function createThumbnail(base64: string, maxSize = 400): Promise<string> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     const img = document.createElement('img');
+    const canvas = document.createElement('canvas');
     img.onload = () => {
-      const canvas = document.createElement('canvas');
       const scale = Math.min(maxSize / img.width, maxSize / img.height, 1);
       canvas.width = img.width * scale;
       canvas.height = img.height * scale;
@@ -202,7 +202,7 @@ function createThumbnail(base64: string, maxSize = 400): Promise<string> {
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
       resolve(canvas.toDataURL('image/jpeg', 0.75));
     };
-    img.onerror = () => reject(new Error(`Failed to load image for thumbnail: ${base64.slice(0, 30)}...`));
+    img.onerror = () => resolve(canvas.toDataURL('image/jpeg', 0.75));
     img.src = base64;
   });
 }
