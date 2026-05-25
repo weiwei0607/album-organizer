@@ -44,10 +44,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
         </div>
         <div className="p-5 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">OpenAI API Key</label>
+            <label className="block text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5">Gemini API Key</label>
             <input
               type="password"
-              placeholder="sk-..."
+              placeholder="AIzaSy..."
               value={tempKey}
               onChange={e => { setTempKey(e.target.value); setKeyValid(null); }}
               className="w-full h-11 px-3 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 text-sm focus:outline-none focus:ring-2 focus:ring-violet-200 dark:focus:ring-violet-800 transition-shadow"
@@ -70,7 +70,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
           <div className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed space-y-1">
             <p>• Key 會直接儲存在您的瀏覽器，不會上傳到任何其他伺服器。</p>
             <p>• 用於截圖智能分類、自動抓取並建立旅遊相簿、以及生成發文文案。</p>
-            <p>• 建議使用 GPT-4o-mini，單次分析極為便宜。</p>
+            <p>• 建議使用 Gemini 1.5 Flash，單次分析極為便宜。</p>
           </div>
           
           <div className="pt-2">
