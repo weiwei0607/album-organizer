@@ -136,7 +136,9 @@ export function usePhotos() {
 
   const dataURLtoBlob = (dataurl: string): Blob => {
     const arr = dataurl.split(',');
-    const mime = arr[0].match(/:(.*?);/)![1];
+    const mimeMatch = arr[0].match(/:(.*?);/);
+    if (!mimeMatch) throw new Error('Invalid data URL format');
+    const mime = mimeMatch[1];
     const bstr = atob(arr[1]);
     let n = bstr.length;
     const u8arr = new Uint8Array(n);
