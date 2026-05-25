@@ -3,7 +3,7 @@ import { testApiKey } from '../utils/ai';
 
 export function useApiKey() {
   const [apiKey, setApiKey] = useState(() => {
-    return import.meta.env.VITE_GEMINI_API_KEY || localStorage.getItem('album-openai-key') || '';
+    return localStorage.getItem('album-openai-key') || '';
   });
   const [keyValid, setKeyValid] = useState<boolean | null>(null);
 
