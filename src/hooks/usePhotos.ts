@@ -24,7 +24,7 @@ export function usePhotos() {
       }
       const { data: { text } } = await workerRef.current.recognize(photo.fullImage);
       const trimmed = text.trim();
-      const isScreenshot = trimmed.length > 15 && /[\d\$￥€£¥]|http|@|#|NT\$|RMB|元|折|優惠|地址|電話|時間|日期/.test(trimmed);
+      const isScreenshot = trimmed.length > 15 && /[\d$￥€£¥]|http|@|#|NT\$|RMB|元|折|優惠|地址|電話|時間|日期/.test(trimmed);
       let category: CategoryKey = 'other';
       if (/價格|NT\$|¥|\$|元|折|優惠|特價|買|賣|包|免運/.test(trimmed)) category = 'shopping';
       else if (/地址|地圖|路|號|樓|店|餐廳|咖啡|捷運|站/.test(trimmed)) category = 'location';
@@ -41,6 +41,7 @@ export function usePhotos() {
       await loadPhotos();
     } catch (e) {
       console.error(e);
+      return false;
     } finally {
       setProcessingIds(prev => {
         const next = new Set(prev);
@@ -52,8 +53,13 @@ export function usePhotos() {
 
   const processAll = useCallback(async () => {
     const targets = photos.filter(p => p.type === 'unknown');
+    let failCount = 0;
     for (const p of targets) {
-      await processPhoto(p);
+      const ok = await processPhoto(p);
+      if (ok === false) failCount++;
+    }
+    if (failCount > 0) {
+      alert(`${failCount} 張照片 OCR 失敗，請檢查圖片格式或重試。`);
     }
   }, [photos, processPhoto]);
 
@@ -148,7 +154,7 @@ export function usePhotos() {
     const { default: JSZip } = await import('jszip');
     const zip = new JSZip();
     const folder = zip.folder('相簿整理');
-    const meta: any[] = [];
+    const meta: Array<{ fileName: string; type: PhotoItem['type']; noteCategory: PhotoItem['noteCategory']; postStatus: PhotoItem['postStatus']; ocrText: string | undefined; createdAt: string }> = [];
 
     for (const p of selectedPhotos) {
       const blob = dataURLtoBlob(p.fullImage);

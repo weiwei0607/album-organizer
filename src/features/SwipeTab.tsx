@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Layers, CheckCircle2, Trash2, Star, Heart } from 'lucide-react';
 import { useAppContext } from '../context/AppContext';
 import { db } from '../db';
@@ -15,11 +15,19 @@ export const SwipeTab: React.FC = () => {
       .sort((a, b) => b.createdAt - a.createdAt);
   }, [photos]);
 
+  // When swipeIndex goes past the end of a non-empty list (stale index after array shrinks),
+  // reset to beginning. When list is empty, stay at 0 to show the completion state.
+  useEffect(() => {
+    if (swipePhotos.length > 0 && swipeIndex >= swipePhotos.length) {
+      setSwipeIndex(0);
+    }
+  }, [swipeIndex, swipePhotos.length]);
+
   const handleSwipeAction = async (action: 'delete' | 'keep' | 'star') => {
     const photo = swipePhotos[swipeIndex];
     if (!photo) return;
     setSwipeDir(action === 'delete' ? 'left' : action === 'keep' ? 'right' : 'up');
-    
+
     setTimeout(async () => {
       if (action === 'delete') {
         await db.photos.update(photo.id, { isDeleted: true });
@@ -30,9 +38,6 @@ export const SwipeTab: React.FC = () => {
       }
       await loadPhotos();
       setSwipeDir(null);
-      if (swipeIndex >= swipePhotos.length - 1) {
-        setSwipeIndex(0);
-      }
     }, 300);
   };
 
