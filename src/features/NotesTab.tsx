@@ -28,8 +28,9 @@ export const NotesTab: React.FC = () => {
     return list.sort((a, b) => b.createdAt - a.createdAt);
   }, [notes, notesFilter, searchQuery]);
 
-  // Clear summary when filter changes
+  // Clear summary when filter changes — resetting derived UI state on dep change is intentional
   React.useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setCategorySummary(null);
   }, [notesFilter]);
 
@@ -67,13 +68,13 @@ export const NotesTab: React.FC = () => {
       const cat = categories.find(c => c.key === note.noteCategory);
       md += `## ${i + 1}. ${cat?.label || '未分類'}\n\n`;
       md += `> ${note.ocrText?.replace(/\n/g, '\n> ') || ''}\n\n`;
-      md += `*來源：${note.fileName} · ${new Date(note.createdAt).toLocaleDateString()}*\n\n---\n\n`;
+      md += `*來源：${note.fileName} · ${new Date(note.createdAt).toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' })}*\n\n---\n\n`;
     });
     const blob = new Blob([md], { type: 'text/markdown' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `相簿整理筆記-${new Date().toISOString().slice(0, 10)}.md`;
+    a.download = `相簿整理筆記-${new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Taipei' }).format(new Date())}.md`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -187,7 +188,7 @@ export const NotesTab: React.FC = () => {
                           {cat.label}
                         </span>
                       )}
-                      <span className="text-[11px] font-medium text-neutral-400">{new Date(note.createdAt).toLocaleDateString()}</span>
+                      <span className="text-[11px] font-medium text-neutral-400">{new Date(note.createdAt).toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' })}</span>
                     </div>
                     <p className="text-sm text-neutral-700 dark:text-neutral-200 leading-relaxed line-clamp-3 font-medium">
                       {note.ocrText}

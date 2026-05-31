@@ -23,7 +23,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ onClose }) => {
       if (valid) {
         saveKey(tempKey);
       }
-    } catch (e) {
+    } catch {
       setKeyValid(false);
     } finally {
       setTestingKey(false);

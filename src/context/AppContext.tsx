@@ -39,17 +39,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setJourneys(all.sort((a, b) => b.startDate - a.startDate));
   }, []);
 
-  // Init Data
+  // Init Data — loading from IndexedDB on mount, setState inside callbacks is intentional
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadPhotos();
     loadJourneys();
   }, [loadPhotos, loadJourneys]);
 
   // Tesseract worker is lazy-initialized on first OCR use (see workerRef consumers)
   useEffect(() => {
-    return () => {
-      workerRef.current?.terminate();
-    };
+    // Intentionally use ref directly in cleanup to terminate whatever worker is active on unmount
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    return () => { workerRef.current?.terminate(); };
   }, []);
 
   return (
@@ -70,6 +71,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useAppContext() {
   const context = useContext(AppContext);
   if (!context) throw new Error('useAppContext must be used within AppProvider');

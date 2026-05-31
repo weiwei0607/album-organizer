@@ -1,7 +1,7 @@
 // Gemini API wrappers for screenshot AI classification and IG caption generation
 // API key is stored in localStorage by user
 
-const getApiUrl = (apiKey: string) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+const getApiUrl = (apiKey: string) => `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
 export interface AIAnalysisResult {
   category: 'shopping' | 'location' | 'quote' | 'recipe' | 'work' | 'other';
@@ -10,8 +10,9 @@ export interface AIAnalysisResult {
   confidence: number;
 }
 
-function parseGeminiResponse(data: any): string {
-  return data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+function parseGeminiResponse(data: unknown): string {
+  const d = data as { candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }> };
+  return d.candidates?.[0]?.content?.parts?.[0]?.text || '';
 }
 
 /**
@@ -70,10 +71,10 @@ export async function analyzeScreenshot(
   
   // Extract JSON from possible markdown code block
   const jsonMatch = raw.match(/\{[\s\S]*\}/);
-  let parsed: any = {};
+  let parsed: Partial<AIAnalysisResult> = {};
   try {
-    parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw);
-  } catch (e) {
+    parsed = JSON.parse(jsonMatch ? jsonMatch[0] : raw) as Partial<AIAnalysisResult>;
+  } catch {
     console.error('Failed to parse Gemini JSON:', raw);
   }
 
@@ -136,7 +137,7 @@ export async function generateIGCaption(
  */
 export async function testApiKey(apiKey: string): Promise<boolean> {
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash?key=${apiKey}`);
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash?key=${apiKey}`);
     return res.ok;
   } catch {
     return false;

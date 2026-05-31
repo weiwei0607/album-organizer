@@ -5,7 +5,7 @@ import { useAppContext } from '../context/AppContext';
 import { saveAs } from 'file-saver';
 
 function formatDate(ts: number): string {
-  return new Date(ts).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' });
+  return new Date(ts).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric', timeZone: 'Asia/Taipei' });
 }
 
 export function formatDateRange(start: number, end: number): string {
@@ -101,8 +101,9 @@ export function useJourneys() {
         try {
           const coverPhoto = clusterPhotos[0];
           const base64Data = coverPhoto.fullImage.split(',')[1] || coverPhoto.fullImage;
-          const prompt = `你是一個旅遊達人，根據這組旅行照片，請幫這趟旅程取一個有詩意的標題，並推測地點，寫一段 50 字內的遊記開頭。這組旅程有 ${clusterPhotos.length} 張照片，時間從 ${new Date(startDate).toLocaleDateString()} 到 ${new Date(endDate).toLocaleDateString()}。請返回 JSON：{"name": "標題", "location": "地點", "description": "遊記開頭"}`;
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+          const fmtDate = (ts: number) => new Date(ts).toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
+          const prompt = `你是一個旅遊達人，根據這組旅行照片，請幫這趟旅程取一個有詩意的標題，並推測地點，寫一段 50 字內的遊記開頭。這組旅程有 ${clusterPhotos.length} 張照片，時間從 ${fmtDate(startDate)} 到 ${fmtDate(endDate)}。請返回 JSON：{"name": "標題", "location": "地點", "description": "遊記開頭"}`;
+          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -169,12 +170,13 @@ export function useJourneys() {
     try {
       const journeyPhotos = photos.filter(p => journey.photoIds.includes(p.id)).slice(0, 5);
       const textPrompt = `你是一個擅長寫旅遊遊記的作家，用繁體中文寫作，風格溫暖有畫面感。這是一趟${journey.location || ''}的旅程，時間是 ${formatDateRange(journey.startDate, journey.endDate)}，共 ${journey.photoIds.length} 張照片。請根據這些照片寫一段 100 字以內的旅遊遊記，風格溫暖、有畫面感，像跟朋友分享旅行見聞。`;
-      const parts: any[] = [{ text: textPrompt }];
+      type GeminiPart = { text: string } | { inline_data: { mime_type: string; data: string } };
+      const parts: GeminiPart[] = [{ text: textPrompt }];
       for (const p of journeyPhotos) {
         parts.push({ inline_data: { mime_type: 'image/jpeg', data: p.fullImage.split(',')[1] || p.fullImage } });
       }
 
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -243,7 +245,7 @@ export function useJourneys() {
       if (p.ocrText) md += `> ${p.ocrText.slice(0, 200).replace(/\n/g, ' ')}\n\n`;
     });
     md += `---\n\n`;
-    md += `*匯出自 Album Organizer · ${new Date().toLocaleDateString()}*`;
+    md += `*匯出自 Album Organizer · ${new Date().toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' })}*`;
     return md;
   }, [photos]);
 
