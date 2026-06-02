@@ -8,6 +8,7 @@ export const SwipeTab: React.FC = () => {
   const { photos, loadPhotos } = useAppContext();
   const [swipeIndex, setSwipeIndex] = useState(0);
   const [swipeDir, setSwipeDir] = useState<'left' | 'right' | 'up' | null>(null);
+  const [isProcessing, setIsProcessing] = useState(false);
 
   const swipePhotos = useMemo(() => {
     return photos
@@ -25,19 +26,24 @@ export const SwipeTab: React.FC = () => {
 
   const handleSwipeAction = async (action: 'delete' | 'keep' | 'star') => {
     const photo = swipePhotos[swipeIndex];
-    if (!photo) return;
+    if (!photo || isProcessing) return;
+    setIsProcessing(true);
     setSwipeDir(action === 'delete' ? 'left' : action === 'keep' ? 'right' : 'up');
 
     setTimeout(async () => {
-      if (action === 'delete') {
-        await db.photos.update(photo.id, { isDeleted: true });
-      } else if (action === 'keep') {
-        await db.photos.update(photo.id, { postStatus: 'keep' });
-      } else if (action === 'star') {
-        await db.photos.update(photo.id, { postStatus: 'posted' });
+      try {
+        if (action === 'delete') {
+          await db.photos.update(photo.id, { isDeleted: true });
+        } else if (action === 'keep') {
+          await db.photos.update(photo.id, { postStatus: 'keep' });
+        } else if (action === 'star') {
+          await db.photos.update(photo.id, { postStatus: 'posted' });
+        }
+        await loadPhotos();
+      } finally {
+        setSwipeDir(null);
+        setIsProcessing(false);
       }
-      await loadPhotos();
-      setSwipeDir(null);
     }, 300);
   };
 
@@ -108,19 +114,22 @@ export const SwipeTab: React.FC = () => {
           <div className="flex items-center justify-center gap-8 mt-4">
             <button
               onClick={() => handleSwipeAction('delete')}
-              className="w-[72px] h-[72px] rounded-full bg-white dark:bg-neutral-900 shadow-xl border border-rose-100 dark:border-rose-900/50 flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 active:scale-90 transition-all"
+              disabled={isProcessing}
+              className="w-[72px] h-[72px] rounded-full bg-white dark:bg-neutral-900 shadow-xl border border-rose-100 dark:border-rose-900/50 flex items-center justify-center text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-950/40 active:scale-90 transition-all disabled:opacity-50 disabled:scale-100"
             >
               <Trash2 className="w-8 h-8" />
             </button>
             <button
               onClick={() => handleSwipeAction('star')}
-              className="w-[60px] h-[60px] rounded-full bg-white dark:bg-neutral-900 shadow-xl border border-amber-100 dark:border-amber-900/50 flex items-center justify-center text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 active:scale-90 transition-all mt-4"
+              disabled={isProcessing}
+              className="w-[60px] h-[60px] rounded-full bg-white dark:bg-neutral-900 shadow-xl border border-amber-100 dark:border-amber-900/50 flex items-center justify-center text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 active:scale-90 transition-all mt-4 disabled:opacity-50 disabled:scale-100"
             >
               <Star className="w-6 h-6" />
             </button>
             <button
               onClick={() => handleSwipeAction('keep')}
-              className="w-[72px] h-[72px] rounded-full bg-white dark:bg-neutral-900 shadow-xl border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 active:scale-90 transition-all"
+              disabled={isProcessing}
+              className="w-[72px] h-[72px] rounded-full bg-white dark:bg-neutral-900 shadow-xl border border-emerald-100 dark:border-emerald-900/50 flex items-center justify-center text-emerald-500 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 active:scale-90 transition-all disabled:opacity-50 disabled:scale-100"
             >
               <Heart className="w-8 h-8" />
             </button>

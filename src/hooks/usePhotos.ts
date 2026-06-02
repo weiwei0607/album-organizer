@@ -22,7 +22,17 @@ export function usePhotos() {
         const { createWorker } = await import('tesseract.js');
         workerRef.current = await createWorker('chi_tra+eng');
       }
-      const { data: { text } } = await workerRef.current.recognize(photo.fullImage);
+      // Guard against stale terminated worker (e.g. after StrictMode unmount)
+      let recognizeResult;
+      try {
+        recognizeResult = await workerRef.current.recognize(photo.fullImage);
+      } catch (workerErr) {
+        // Worker might be terminated; recreate and retry once
+        const { createWorker } = await import('tesseract.js');
+        workerRef.current = await createWorker('chi_tra+eng');
+        recognizeResult = await workerRef.current.recognize(photo.fullImage);
+      }
+      const { data: { text } } = recognizeResult;
       const trimmed = text.trim();
       const isScreenshot = trimmed.length > 15 && /[\d$￥€£¥]|http|@|#|NT\$|RMB|元|折|優惠|地址|電話|時間|日期/.test(trimmed);
       let category: CategoryKey = 'other';

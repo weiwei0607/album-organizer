@@ -31,9 +31,9 @@ class AlbumDB extends Dexie {
 
   constructor() {
     super('AlbumOrganizer');
-    this.version(2).stores({
-      photos: '++id, type, noteCategory, postStatus, createdAt',
-      journeys: '++id, startDate, endDate',
+    this.version(3).stores({
+      photos: 'id, type, noteCategory, postStatus, createdAt',
+      journeys: 'id, startDate, endDate',
     });
   }
 }
