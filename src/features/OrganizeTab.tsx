@@ -22,12 +22,13 @@ export const OrganizeTab: React.FC<OrganizeTabProps> = ({ setShowSettings }) => 
     let done = 0;
     for (const file of imageFiles) {
       const base64 = await fileToBase64(file);
-      const thumbnail = await createThumbnail(base64);
+      const compressed = await compressImage(base64, 1920, 0.85);
+      const thumbnail = await createThumbnail(compressed);
       const item: PhotoItem = {
         id: Math.random().toString(36).slice(2) + Date.now().toString(36),
         fileName: file.name,
         thumbnail,
-        fullImage: base64,
+        fullImage: compressed,
         type: 'unknown',
         createdAt: Date.now(),
       };
@@ -96,7 +97,7 @@ export const OrganizeTab: React.FC<OrganizeTabProps> = ({ setShowSettings }) => 
             <span className="text-sm font-bold text-violet-700 dark:text-violet-300">AI 分析已啟用</span>
           </div>
           <p className="text-xs text-violet-600/80 dark:text-violet-400/80">
-            已設定 OpenAI API Key，可使用 AI 進一步分析截圖內容
+            已設定 Gemini API Key，可使用 AI 進一步分析截圖內容
           </p>
         </div>
       )}
@@ -106,7 +107,7 @@ export const OrganizeTab: React.FC<OrganizeTabProps> = ({ setShowSettings }) => 
           className="w-full py-3.5 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 text-sm font-bold hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-2"
         >
           <Sparkles className="w-4 h-4" />
-          設定 OpenAI API Key 啟用 AI 分析
+          設定 Gemini API Key 啟用 AI 分析
         </button>
       )}
 
@@ -187,6 +188,22 @@ function fileToBase64(file: File): Promise<string> {
     reader.onloadend = () => resolve(reader.result as string);
     reader.onerror = reject;
     reader.readAsDataURL(file);
+  });
+}
+
+function compressImage(base64: string, maxWidth = 1920, quality = 0.85): Promise<string> {
+  return new Promise((resolve) => {
+    const img = document.createElement('img');
+    img.onload = () => {
+      if (img.width <= maxWidth) { resolve(base64); return; }
+      const scale = maxWidth / img.width;
+      const canvas = document.createElement('canvas');
+      canvas.width = maxWidth;
+      canvas.height = img.height * scale;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, canvas.width, canvas.height);
+      resolve(canvas.toDataURL('image/jpeg', quality));
+    };
+    img.src = base64;
   });
 }
 

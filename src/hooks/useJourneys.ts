@@ -3,6 +3,7 @@ import { db } from '../db';
 import type { Journey, PhotoItem } from '../db';
 import { useAppContext } from '../context/AppContext';
 import { saveAs } from 'file-saver';
+import { fetchWithTimeout } from '../utils/ai';
 
 function formatDate(ts: number): string {
   return new Date(ts).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric', timeZone: 'Asia/Taipei' });
@@ -103,7 +104,7 @@ export function useJourneys() {
           const base64Data = coverPhoto.fullImage.split(',')[1] || coverPhoto.fullImage;
           const fmtDate = (ts: number) => new Date(ts).toLocaleDateString('zh-TW', { timeZone: 'Asia/Taipei' });
           const prompt = `你是一個旅遊達人，根據這組旅行照片，請幫這趟旅程取一個有詩意的標題，並推測地點，寫一段 50 字內的遊記開頭。這組旅程有 ${clusterPhotos.length} 張照片，時間從 ${fmtDate(startDate)} 到 ${fmtDate(endDate)}。請返回 JSON：{"name": "標題", "location": "地點", "description": "遊記開頭"}`;
-          const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+          const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

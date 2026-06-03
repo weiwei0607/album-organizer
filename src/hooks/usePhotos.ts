@@ -9,6 +9,7 @@ import type { CategoryKey } from '../constants';
 export function usePhotos() {
   const { photos, loadPhotos, workerRef, apiKey } = useAppContext();
   const [processingIds, setProcessingIds] = useState<Set<string>>(new Set());
+  const [failedIds, setFailedIds] = useState<Set<string>>(new Set());
   const [aiAnalyzingIds, setAiAnalyzingIds] = useState<Set<string>>(new Set());
   const [aiResults, setAiResults] = useState<Record<string, { subCategory: string; summary: string; confidence: number }>>({});
   const [generatingCaption, setGeneratingCaption] = useState(false);
@@ -23,14 +24,20 @@ export function usePhotos() {
         workerRef.current = await createWorker('chi_tra+eng');
       }
       // Guard against stale terminated worker (e.g. after StrictMode unmount)
+      // Also wrap in a 60s timeout to prevent UI freeze on hung OCR
+      const OCR_TIMEOUT_MS = 60000;
+      const withOcrTimeout = (p: Promise<unknown>) => Promise.race([
+        p,
+        new Promise((_, reject) => setTimeout(() => reject(new Error('OCR timeout')), OCR_TIMEOUT_MS)),
+      ]);
       let recognizeResult;
       try {
-        recognizeResult = await workerRef.current.recognize(photo.fullImage);
+        recognizeResult = await withOcrTimeout(workerRef.current.recognize(photo.fullImage)) as Awaited<ReturnType<typeof workerRef.current.recognize>>;
       } catch (workerErr) {
         // Worker might be terminated; recreate and retry once
         const { createWorker } = await import('tesseract.js');
         workerRef.current = await createWorker('chi_tra+eng');
-        recognizeResult = await workerRef.current.recognize(photo.fullImage);
+        recognizeResult = await withOcrTimeout(workerRef.current.recognize(photo.fullImage)) as Awaited<ReturnType<typeof workerRef.current.recognize>>;
       }
       const { data: { text } } = recognizeResult;
       const trimmed = text.trim();
@@ -63,13 +70,16 @@ export function usePhotos() {
 
   const processAll = useCallback(async () => {
     const targets = photos.filter(p => p.type === 'unknown');
-    let failCount = 0;
+    const failed: string[] = [];
     for (const p of targets) {
       const ok = await processPhoto(p);
-      if (ok === false) failCount++;
+      if (ok === false) {
+        failed.push(p.fileName);
+        setFailedIds(prev => new Set(prev).add(p.id));
+      }
     }
-    if (failCount > 0) {
-      alert(`${failCount} 張照片 OCR 失敗，請檢查圖片格式或重試。`);
+    if (failed.length > 0) {
+      alert(`${failed.length} 張照片 OCR 失敗：\n${failed.slice(0, 5).join('\n')}${failed.length > 5 ? `\n…等 ${failed.length} 張` : ''}`);
     }
   }, [photos, processPhoto]);
 
@@ -185,6 +195,7 @@ export function usePhotos() {
 
   return {
     processingIds,
+    failedIds,
     aiAnalyzingIds,
     aiResults,
     generatingCaption,

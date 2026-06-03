@@ -5,7 +5,7 @@ const getApiUrl = (apiKey: string) => `https://generativelanguage.googleapis.com
 
 const API_TIMEOUT_MS = 30000;
 
-function fetchWithTimeout(url: string, options: RequestInit): Promise<Response> {
+export function fetchWithTimeout(url: string, options: RequestInit): Promise<Response> {
   const controller = new AbortController();
   const id = setTimeout(() => controller.abort(), API_TIMEOUT_MS);
   return fetch(url, { ...options, signal: controller.signal }).finally(() => clearTimeout(id));
