@@ -33,7 +33,7 @@ export function usePhotos() {
       let recognizeResult;
       try {
         recognizeResult = await withOcrTimeout(workerRef.current.recognize(photo.fullImage)) as Awaited<ReturnType<typeof workerRef.current.recognize>>;
-      } catch (workerErr) {
+      } catch {
         // Worker might be terminated; recreate and retry once
         const { createWorker } = await import('tesseract.js');
         workerRef.current = await createWorker('chi_tra+eng');

@@ -20,6 +20,9 @@ export const SwipeTab: React.FC = () => {
   // reset to beginning. When list is empty, stay at 0 to show the completion state.
   useEffect(() => {
     if (swipePhotos.length > 0 && swipeIndex >= swipePhotos.length) {
+      // Intentional guard: list shrank below current index (e.g. after a swipe
+      // deleted the last item), reset to start. Synchronous reset is correct here.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSwipeIndex(0);
     }
   }, [swipeIndex, swipePhotos.length]);
