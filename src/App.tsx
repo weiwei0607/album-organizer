@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Camera, Sun, Moon, Settings, ScanText, Layers, Compass, NotebookPen, Grid3X3, Wand2 } from 'lucide-react';
+import { SplashScreen } from './components/SplashScreen';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { OrganizeTab } from './features/OrganizeTab';
 import { SwipeTab } from './features/SwipeTab';
@@ -15,6 +16,13 @@ function AppContent() {
   const { isDark, toggleDark, photos, journeys } = useAppContext();
   const [tab, setTab] = useState<TabKey>('organize');
   const [showSettings, setShowSettings] = useState(false);
+  const [splash, setSplash] = useState<boolean>(() => {
+    try {
+      if (sessionStorage.getItem('ao_splash')) return false;
+      sessionStorage.setItem('ao_splash', '1');
+      return true;
+    } catch { return false; }
+  });
 
   const stats = {
     unprocessed: photos.filter(p => p.type === 'unknown').length,
@@ -35,6 +43,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen max-w-md mx-auto relative shadow-2xl" style={{ background: 'var(--bg)', color: 'var(--text-1)' }}>
+      {splash && <SplashScreen onDone={() => setSplash(false)} isDark={isDark} />}
 
       {/* ── Header ── */}
       <header className="sticky top-0 z-40 backdrop-blur-xl"
