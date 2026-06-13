@@ -2,17 +2,152 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ── Warm Film × Editorial Photography Design System ─────────────
+   Light:  warm off-white bg, soft shadows, emerald accent
+   Dark:   warm near-black, rich dark surfaces
+   ─────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Light mode */
+  --bg:       #F9F8F6;
+  --surface:  #FFFFFF;
+  --surface-2: #F3F1EE;
+  --border:   #E6E2DC;
+  --border-2: #D4CFC8;
+  --text-1:   #1A1814;
+  --text-2:   #6B655D;
+  --text-3:   #A89E94;
+  --green:    #10B981;
+  --green-dim: rgba(16,185,129,0.08);
+  --green-mid: rgba(16,185,129,0.18);
+  --shadow-sm: 0 1px 4px rgba(26,24,20,0.06), 0 1px 2px rgba(26,24,20,0.04);
+  --shadow-md: 0 4px 16px rgba(26,24,20,0.08), 0 2px 6px rgba(26,24,20,0.04);
+  --shadow-lg: 0 12px 40px rgba(26,24,20,0.12), 0 4px 12px rgba(26,24,20,0.06);
+}
+
+.dark {
+  --bg:        #0D0C0A;
+  --surface:   #181614;
+  --surface-2: #211F1C;
+  --border:    rgba(255,255,255,0.07);
+  --border-2:  rgba(255,255,255,0.12);
+  --text-1:    #F5F2EE;
+  --text-2:    rgba(245,242,238,0.55);
+  --text-3:    rgba(245,242,238,0.28);
+  --shadow-sm: 0 1px 4px rgba(0,0,0,0.4);
+  --shadow-md: 0 4px 20px rgba(0,0,0,0.5);
+  --shadow-lg: 0 12px 48px rgba(0,0,0,0.6);
+}
+
+* { -webkit-tap-highlight-color: transparent; }
+
 @layer base {
   body {
-    @apply bg-neutral-50 text-neutral-900 antialiased;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, "Noto Sans TC", sans-serif;
+    background: var(--bg);
+    color: var(--text-1);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: background 0.25s ease, color 0.25s ease;
   }
 }
 
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+/* ── Scrollbar ──────────────────────────────────── */
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+
+/* ── Cards ───────────────────────────────────────── */
+.ao-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.18s, transform 0.18s;
 }
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
+.ao-card:hover { box-shadow: var(--shadow-md); }
+.ao-card-lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+
+/* ── Buttons ─────────────────────────────────────── */
+.btn-emerald {
+  background: var(--green);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(16,185,129,0.30);
+  font-weight: 600;
+  transition: all 0.16s ease;
 }
+.btn-emerald:hover { filter: brightness(1.07); }
+.btn-emerald:active { transform: scale(0.96); }
+
+.btn-ghost {
+  background: var(--surface-2);
+  color: var(--text-2);
+  border: 1px solid var(--border);
+  font-weight: 500;
+  transition: all 0.16s ease;
+}
+.btn-ghost:hover { background: var(--border); color: var(--text-1); }
+.btn-ghost:active { transform: scale(0.97); }
+
+/* ── Inputs ──────────────────────────────────────── */
+.ao-input {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-1);
+  transition: border-color 0.16s, box-shadow 0.16s;
+}
+.ao-input:focus {
+  outline: none;
+  border-color: rgba(16,185,129,0.5);
+  box-shadow: 0 0 0 3px rgba(16,185,129,0.10);
+}
+.ao-input::placeholder { color: var(--text-3); }
+
+/* ── Tag / badge ─────────────────────────────────── */
+.ao-tag {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-weight: 600;
+}
+.ao-tag-green {
+  background: var(--green-dim);
+  border: 1px solid var(--green-mid);
+  color: var(--green);
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-weight: 600;
+}
+
+/* ── Divider ─────────────────────────────────────── */
+.ao-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0;
+}
+
+/* ── Animations ──────────────────────────────────── */
+@keyframes ao-fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes ao-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes ao-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.ao-fade-up   { animation: ao-fade-up  0.35s ease both; }
+.ao-fade-in   { animation: ao-fade-in  0.25s ease both; }
+.ao-scale-in  { animation: ao-scale-in 0.3s  ease both; }
+
+/* Stagger delays */
+.delay-50  { animation-delay: 0.05s; }
+.delay-100 { animation-delay: 0.10s; }
+.delay-150 { animation-delay: 0.15s; }
+.delay-200 { animation-delay: 0.20s; }

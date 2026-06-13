@@ -25,47 +25,69 @@ function AppContent() {
   };
 
   const tabs = [
-    { key: 'organize' as TabKey, label: '整理', icon: ScanText, count: stats.unprocessed },
-    { key: 'swipe' as TabKey, label: '快速', icon: Layers, count: stats.swipe },
-    { key: 'journeys' as TabKey, label: '旅程', icon: Compass, count: stats.journeys },
-    { key: 'notes' as TabKey, label: '筆記', icon: NotebookPen, count: stats.notes },
-    { key: 'gallery' as TabKey, label: '相簿', icon: Grid3X3, count: stats.total },
-    { key: 'tools' as TabKey, label: '工具', icon: Wand2, count: 0 },
+    { key: 'organize' as TabKey, label: '整理', icon: ScanText,     count: stats.unprocessed },
+    { key: 'swipe'    as TabKey, label: '快速', icon: Layers,        count: stats.swipe },
+    { key: 'journeys' as TabKey, label: '旅程', icon: Compass,       count: stats.journeys },
+    { key: 'notes'    as TabKey, label: '筆記', icon: NotebookPen,   count: stats.notes },
+    { key: 'gallery'  as TabKey, label: '相簿', icon: Grid3X3,       count: stats.total },
+    { key: 'tools'    as TabKey, label: '工具', icon: Wand2,         count: 0 },
   ];
 
   return (
-    <div className="min-h-screen max-w-md mx-auto bg-neutral-50/50 dark:bg-neutral-950/50 shadow-2xl relative transition-colors">
-      {/* Header */}
-      <header className="sticky top-0 z-40 bg-white/70 dark:bg-neutral-900/70 backdrop-blur-xl border-b border-neutral-200/50 dark:border-neutral-800/50 transition-colors pt-safe">
-        <div className="px-5 pt-5 pb-4 flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-2 mb-1.5">
-              <div className="w-9 h-9 rounded-2xl bg-gradient-to-br from-emerald-400 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                <Camera className="w-5 h-5 text-white" />
-              </div>
-              <h1 className="text-xl font-black tracking-tight text-neutral-900 dark:text-white">相簿整理</h1>
+    <div className="min-h-screen max-w-md mx-auto relative shadow-2xl" style={{ background: 'var(--bg)', color: 'var(--text-1)' }}>
+
+      {/* ── Header ── */}
+      <header className="sticky top-0 z-40 backdrop-blur-xl"
+        style={{
+          background: isDark ? 'rgba(13,12,10,0.88)' : 'rgba(249,248,246,0.88)',
+          borderBottom: `1px solid var(--border)`,
+        }}>
+        <div className="px-5 pt-5 pb-4 flex items-center justify-between">
+          {/* Brand */}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
+              style={{
+                background: 'linear-gradient(135deg, #34D399 0%, #059669 100%)',
+                boxShadow: '0 4px 16px rgba(16,185,129,0.30)',
+              }}>
+              <Camera className="w-5 h-5 text-white" />
             </div>
-            <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-              {stats.total > 0 ? `${stats.total} 張照片 · ${stats.journeys} 趟旅程` : '截圖轉筆記 · 回憶標狀態'}
-            </p>
+            <div>
+              <h1 className="text-lg font-black leading-none" style={{ color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
+                相簿整理
+              </h1>
+              <p className="text-[11px] mt-0.5 font-medium" style={{ color: 'var(--text-3)' }}>
+                {stats.total > 0 ? `${stats.total} 張 · ${stats.journeys} 趟旅程` : '截圖轉筆記 · 回憶標狀態'}
+              </p>
+            </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setShowSettings(true)}
-              className="w-10 h-10 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-300 shadow-sm border border-neutral-200/50 dark:border-neutral-700/50 hover:scale-105 active:scale-95 transition-all"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
+
+          {/* Actions */}
+          <div className="flex items-center gap-1.5">
             <button
               onClick={toggleDark}
-              className="w-10 h-10 rounded-full bg-white dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-300 shadow-sm border border-neutral-200/50 dark:border-neutral-700/50 hover:scale-105 active:scale-95 transition-all"
-            >
+              className="w-9 h-9 flex items-center justify-center rounded-xl transition-all active:scale-90"
+              style={{
+                background: 'var(--surface-2)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-2)',
+              }}>
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
+            <button
+              onClick={() => setShowSettings(true)}
+              className="w-9 h-9 flex items-center justify-center rounded-xl transition-all active:scale-90"
+              style={{
+                background: 'var(--surface-2)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-2)',
+              }}>
+              <Settings className="w-4 h-4" />
             </button>
           </div>
         </div>
-        
-        {/* Tab Bar */}
+
+        {/* ── Tab Bar ── */}
         <div className="flex px-3 pb-3 gap-1 overflow-x-auto scrollbar-hide">
           {tabs.map(t => {
             const isActive = tab === t.key;
@@ -73,25 +95,32 @@ function AppContent() {
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className={`relative flex-1 min-w-[4.5rem] flex flex-col items-center justify-center gap-1.5 py-2 rounded-2xl transition-all ${
-                  isActive
-                    ? 'text-neutral-900 dark:text-white'
-                    : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 hover:bg-neutral-100/50 dark:hover:bg-neutral-800/50'
-                }`}
-              >
+                className="relative flex-1 min-w-[4.5rem] flex flex-col items-center justify-center gap-1.5 py-2 rounded-2xl transition-all"
+                style={{
+                  color: isActive ? 'var(--text-1)' : 'var(--text-3)',
+                }}>
                 {isActive && (
-                  <motion.div 
+                  <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 bg-white dark:bg-neutral-800 rounded-2xl shadow-sm border border-neutral-200/50 dark:border-neutral-700/50"
-                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                    className="absolute inset-0 rounded-2xl"
+                    style={{
+                      background: 'var(--surface)',
+                      border: '1px solid var(--border)',
+                      boxShadow: 'var(--shadow-sm)',
+                    }}
+                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                   />
                 )}
                 <span className="relative z-10 flex flex-col items-center gap-1.5">
-                  <t.icon className={`w-5 h-5 ${isActive ? 'text-emerald-500' : ''}`} />
+                  <t.icon
+                    className="w-5 h-5"
+                    style={{ color: isActive ? 'var(--green)' : 'inherit' }}
+                  />
                   <span className="text-[10px] font-bold">{t.label}</span>
                 </span>
                 {t.count > 0 && (
-                  <span className="absolute top-1 right-2 w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full"
+                    style={{ background: 'var(--green)' }} />
                 )}
               </button>
             );
@@ -99,7 +128,7 @@ function AppContent() {
         </div>
       </header>
 
-      {/* Main Content */}
+      {/* ── Main Content ── */}
       <main className="p-4 pb-32 overflow-x-hidden">
         <AnimatePresence mode="wait">
           <motion.div
@@ -107,14 +136,14 @@ function AppContent() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.2 }}
+            transition={{ duration: 0.18 }}
           >
             {tab === 'organize' && <OrganizeTab setShowSettings={setShowSettings} />}
-            {tab === 'swipe' && <SwipeTab />}
+            {tab === 'swipe'    && <SwipeTab />}
             {tab === 'journeys' && <JourneysTab />}
-            {tab === 'notes' && <NotesTab />}
-            {tab === 'gallery' && <GalleryTab />}
-            {tab === 'tools' && <ToolsTab setShowSettings={setShowSettings} />}
+            {tab === 'notes'    && <NotesTab />}
+            {tab === 'gallery'  && <GalleryTab />}
+            {tab === 'tools'    && <ToolsTab setShowSettings={setShowSettings} />}
           </motion.div>
         </AnimatePresence>
       </main>
