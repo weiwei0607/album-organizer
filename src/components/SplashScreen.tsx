@@ -11,8 +11,9 @@ export function SplashScreen({ onDone, isDark }: Props) {
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const maybeCtx = canvas.getContext('2d');
+    if (!maybeCtx) return;
+    const ctx = maybeCtx;
 
     canvas.width  = window.innerWidth;
     canvas.height = window.innerHeight;

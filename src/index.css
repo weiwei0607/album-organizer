@@ -151,3 +151,292 @@
 .delay-100 { animation-delay: 0.10s; }
 .delay-150 { animation-delay: 0.15s; }
 .delay-200 { animation-delay: 0.20s; }
+
+/* ── Film grain effect ───────────────────────────── */
+@keyframes ao-grain {
+  0%, 100% { transform: translate(0, 0); }
+  10%       { transform: translate(-2%, -3%); }
+  30%       { transform: translate(3%, -1%); }
+  50%       { transform: translate(-1%, 2%); }
+  70%       { transform: translate(2%, 3%); }
+  90%       { transform: translate(-3%, -2%); }
+}
+.film-grain-overlay {
+  position: fixed;
+  inset: -20%;
+  width: 140%;
+  height: 140%;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.03;
+  animation: ao-grain 0.8s steps(1) infinite;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)' opacity='1'/%3E%3C/svg%3E");
+  background-size: 200px;
+}
+
+/* ── Photo card — film border ─────────────────────── */
+.photo-film {
+  position: relative;
+  overflow: hidden;
+}
+.photo-film::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: inherit;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+/* ── Tab — editorial underline style ─────────────── */
+.ao-tab-active {
+  color: var(--text-1);
+  position: relative;
+}
+.ao-tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: var(--green);
+  border-radius: 2px 2px 0 0;
+}
+.ao-tab-inactive {
+  color: var(--text-3);
+}
+
+/* ── Journey card — destination stamp ───────────── */
+.journey-stamp {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green);
+  opacity: 0.7;
+}
+
+/* ── Swipe card — tinder-feel ────────────────────── */
+.swipe-shadow-left  { box-shadow: -8px 0 28px rgba(239,68,68,0.20); }
+.swipe-shadow-right { box-shadow:  8px 0 28px rgba(16,185,129,0.20); }
+
+/* ── Dark mode film card ─────────────────────────── */
+.dark .ao-card {
+  box-shadow: var(--shadow-sm), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.dark .ao-card:hover {
+  box-shadow: var(--shadow-md), inset 0 1px 0 rgba(255,255,255,0.06);
+}
+
+/* ── Photo badge — film label feel ──────────────── */
+.photo-badge {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+  padding: 3px 7px;
+  border-radius: 5px;
+  backdrop-filter: blur(8px);
+  background: rgba(0,0,0,0.55);
+  color: rgba(255,255,255,0.92);
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+/* ── Photo card status pip ───────────────────────── */
+.photo-pip {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  border: 1.5px solid rgba(255,255,255,0.25);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+}
+
+/* ── Section label — editorial caps ─────────────── */
+.ao-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ao-section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--border), transparent);
+}
+
+/* ── Stat block — large editorial number ─────────── */
+.ao-stat {
+  text-align: center;
+  padding: 14px 12px;
+  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.ao-stat-num {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--text-1);
+  line-height: 1;
+}
+.ao-stat-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--text-3);
+  letter-spacing: 0.06em;
+  margin-top: 4px;
+}
+
+/* ── Upload zone — editorial dashed ─────────────── */
+.ao-dropzone {
+  border: 1.5px dashed var(--border-2);
+  border-radius: 24px;
+  background: var(--surface);
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+.ao-dropzone:hover, .ao-dropzone.drag-over {
+  border-color: var(--green);
+  background: var(--green-dim);
+}
+
+/* ── Progress bar — film strip ───────────────────── */
+.ao-progress-track {
+  height: 2px;
+  border-radius: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+.ao-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--green), #34D399);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(16,185,129,0.4);
+  transition: width 0.3s ease;
+}
+
+/* ── Floating action button ──────────────────────── */
+.ao-fab {
+  width: 52px;
+  height: 52px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #10B981, #059669);
+  box-shadow: 0 6px 20px rgba(16,185,129,0.35), 0 2px 8px rgba(16,185,129,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.ao-fab:active {
+  transform: scale(0.95);
+  box-shadow: 0 3px 12px rgba(16,185,129,0.3);
+}
+
+/* ── Swipe action label ──────────────────────────── */
+.swipe-label-keep {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #10B981;
+  padding: 4px 10px;
+  border: 2px solid #10B981;
+  border-radius: 6px;
+}
+.swipe-label-del {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #EF4444;
+  padding: 4px 10px;
+  border: 2px solid #EF4444;
+  border-radius: 6px;
+}
+
+/* ── Journey card stamp ──────────────────────────── */
+.journey-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.journey-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+}
+
+/* ── Note category pill ──────────────────────────── */
+.ao-cat-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 3px 9px;
+  border-radius: 6px;
+  letter-spacing: 0.04em;
+}
+
+/* ── Empty state — editorial centered ────────────── */
+.ao-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 48px 24px;
+  text-align: center;
+}
+.ao-empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-3);
+}
+.ao-empty-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-1);
+  letter-spacing: -0.02em;
+}
+.ao-empty-sub {
+  font-size: 12px;
+  color: var(--text-3);
+  line-height: 1.6;
+  max-width: 220px;
+}
+
+/* ── Checkbox — custom styled ────────────────────── */
+.ao-check-ring {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.35);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ao-check-ring.checked {
+  background: var(--green);
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(16,185,129,0.5);
+}

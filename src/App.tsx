@@ -54,19 +54,22 @@ function AppContent() {
         <div className="px-5 pt-5 pb-4 flex items-center justify-between">
           {/* Brand */}
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl flex items-center justify-center"
+            <div className="relative w-10 h-10 rounded-[14px] flex items-center justify-center"
               style={{
-                background: 'linear-gradient(135deg, #34D399 0%, #059669 100%)',
-                boxShadow: '0 4px 16px rgba(16,185,129,0.30)',
+                background: isDark
+                  ? 'linear-gradient(145deg, #1a2e25 0%, #0d1f17 100%)'
+                  : 'linear-gradient(145deg, #d1fae5 0%, #a7f3d0 100%)',
+                border: isDark ? '1px solid rgba(52,211,153,0.18)' : '1px solid rgba(16,185,129,0.20)',
+                boxShadow: '0 2px 12px rgba(16,185,129,0.20)',
               }}>
-              <Camera className="w-5 h-5 text-white" />
+              <Camera className="w-5 h-5" style={{ color: isDark ? '#34D399' : '#059669' }} />
             </div>
             <div>
-              <h1 className="text-lg font-black leading-none" style={{ color: 'var(--text-1)', letterSpacing: '-0.02em' }}>
+              <h1 style={{ fontSize: '15px', fontWeight: 800, letterSpacing: '-0.03em', color: 'var(--text-1)', lineHeight: 1 }}>
                 相簿整理
               </h1>
-              <p className="text-[11px] mt-0.5 font-medium" style={{ color: 'var(--text-3)' }}>
-                {stats.total > 0 ? `${stats.total} 張 · ${stats.journeys} 趟旅程` : '截圖轉筆記 · 回憶標狀態'}
+              <p style={{ fontSize: '10px', marginTop: '3px', fontWeight: 600, letterSpacing: '0.06em', color: 'var(--text-3)' }}>
+                {stats.total > 0 ? `${stats.total} 張  ·  ${stats.journeys} 趟旅程` : 'FILM · MEMORIES · NOTES'}
               </p>
             </div>
           </div>
@@ -97,39 +100,37 @@ function AppContent() {
         </div>
 
         {/* ── Tab Bar ── */}
-        <div className="flex px-3 pb-3 gap-1 overflow-x-auto scrollbar-hide">
+        <div className="flex px-3 pb-3 gap-0.5 overflow-x-auto scrollbar-hide">
           {tabs.map(t => {
             const isActive = tab === t.key;
             return (
               <button
                 key={t.key}
                 onClick={() => setTab(t.key)}
-                className="relative flex-1 min-w-[4.5rem] flex flex-col items-center justify-center gap-1.5 py-2 rounded-2xl transition-all"
-                style={{
-                  color: isActive ? 'var(--text-1)' : 'var(--text-3)',
-                }}>
+                className="relative flex-1 min-w-[3.8rem] flex flex-col items-center justify-center gap-1 py-2 rounded-xl transition-all"
+                style={{ color: isActive ? 'var(--text-1)' : 'var(--text-3)' }}>
                 {isActive && (
                   <motion.div
                     layoutId="activeTab"
-                    className="absolute inset-0 rounded-2xl"
+                    className="absolute inset-0 rounded-xl"
                     style={{
-                      background: 'var(--surface)',
+                      background: isDark ? 'var(--surface-2)' : 'var(--surface)',
                       border: '1px solid var(--border)',
-                      boxShadow: 'var(--shadow-sm)',
+                      boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
                     }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                    transition={{ type: 'spring', stiffness: 450, damping: 32 }}
                   />
                 )}
-                <span className="relative z-10 flex flex-col items-center gap-1.5">
+                <span className="relative z-10 flex flex-col items-center gap-1">
                   <t.icon
-                    className="w-5 h-5"
+                    className="w-4 h-4"
                     style={{ color: isActive ? 'var(--green)' : 'inherit' }}
                   />
-                  <span className="text-[10px] font-bold">{t.label}</span>
+                  <span style={{ fontSize: '9px', fontWeight: 700, letterSpacing: '0.04em' }}>{t.label}</span>
                 </span>
                 {t.count > 0 && (
-                  <span className="absolute top-1.5 right-2 w-1.5 h-1.5 rounded-full"
-                    style={{ background: 'var(--green)' }} />
+                  <span className="absolute top-1 right-1.5 w-1.5 h-1.5 rounded-full"
+                    style={{ background: 'var(--green)', boxShadow: '0 0 4px rgba(16,185,129,0.6)' }} />
                 )}
               </button>
             );

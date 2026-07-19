@@ -4,8 +4,8 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/React-19-61DAFB?logo=react" />
-  <img src="https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript" />
-  <img src="https://img.shields.io/badge/Vite-6.x-646CFF?logo=vite" />
+  <img src="https://img.shields.io/badge/TypeScript-6.x-3178C6?logo=typescript" />
+  <img src="https://img.shields.io/badge/Vite-8.x-646CFF?logo=vite" />
   <img src="https://img.shields.io/badge/Tailwind-4.x-06B6D4?logo=tailwindcss" />
   <img src="https://img.shields.io/badge/License-MIT-green.svg" />
 </p>
